@@ -1,4 +1,4 @@
-# baseURL = "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/"
+baseURL = "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/"
 # Change the default theme to be use when building the site with Hugo
 theme = "hugo-theme-learn"
 

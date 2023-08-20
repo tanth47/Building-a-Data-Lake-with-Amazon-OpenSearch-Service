@@ -1,0 +1,127 @@
+[
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/1-introduce/",
+	"title": "Introduction",
+	"tags": [],
+	"description": "",
+	"content": "Amazon OpenSearch Service is a managed search and analytics solution within the AWS ecosystem. It allows users to easily ingest, secure, search, and visualize data in real-time. OpenSearch Service is not just about storing data; it\u0026rsquo;s about making that data actionable with powerful analytics capabilities.\nBy leveraging Amazon OpenSearch Service in our architecture, we gain the following distinct advantages:\nScalability: Handle vast amounts of data without compromising performance. Security: Features like data encryption, VPC support, and integration with AWS Identity and Access Management (IAM) ensure data protection. Real-time Analytics: With OpenSearch Dashboards, users can create visualizations and dashboards that reflect data in real-time. Ease of Integration: Seamlessly integrates with other AWS services, enhancing its capabilities. Cost-Effective: Eliminates the need for infrastructure provisioning, setup, and maintenance. Versatility: Supports multiple data formats and allows for complex search queries. Auditability: Log and monitor all search queries for compliance and security. Given these advantages, Amazon OpenSearch Service emerges as a superior alternative to traditional search and analytics solutions.\nWhat Will You Achieve? By the end of this workshop:\nYou\u0026rsquo;ll have a hands-on understanding of building a data lake on AWS. You\u0026rsquo;ll gain knowledge about Amazon OpenSearch Service and its integration with other AWS services. You\u0026rsquo;ll be equipped to adapt this knowledge to other real-world scenarios, emphasizing data search and analytics. "
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/6-modify-s3-and-aos-policy/6.1-s3/",
+	"title": "Modifying the S3 Bucket Policy for Lambda Access",
+	"tags": [],
+	"description": "",
+	"content": "Modifying the S3 Bucket Policy for Lambda Access In this section, we will modify the S3 bucket policy to allow the Lambda function to write data to the S3 bucket.\nNavigate to the Amazon S3 console.\nOpen the bucket that you created previously.\nChoose the Permissions tab, scroll to Bucket policy, and choose Edit. Replace the existing policy with the following JSON code, ensuring you replace the placeholders \u0026lt;LambdaRoleARN\u0026gt; with the ARN of your Lambda role and \u0026lt;BucketARN\u0026gt; with the ARN of your S3 bucket:\n{ \u0026#34;Version\u0026#34;: \u0026#34;2012-10-17\u0026#34;, \u0026#34;Id\u0026#34;: \u0026#34;ExamplePolicy\u0026#34;, \u0026#34;Statement\u0026#34;: [ { \u0026#34;Sid\u0026#34;: \u0026#34;ExampleStmt\u0026#34;, \u0026#34;Effect\u0026#34;: \u0026#34;Allow\u0026#34;, \u0026#34;Principal\u0026#34;: { \u0026#34;AWS\u0026#34;: \u0026#34;\u0026lt;LambdaRoleARN\u0026gt;\u0026#34; }, \u0026#34;Action\u0026#34;: \u0026#34;s3:*\u0026#34;, \u0026#34;Resource\u0026#34;: \u0026#34;\u0026lt;BucketARN\u0026gt;/*\u0026#34; } ] } In the Bucket policy editor, paste the bucket policy that you configured. Choose Save changes.\nConclusion You have now modified the S3 bucket policy to allow the Lambda function to upload temperature files to your bucket.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/",
+	"title": "Opensearch Service",
+	"tags": [],
+	"description": "",
+	"content": "Building a Data Lake with Amazon OpenSearch Service Objective In this workshop, participants will learn how to construct an AWS-based data lake to monitor and analyze water temperatures from various water bodies. By leveraging AWS services, we\u0026rsquo;ll create a seamless flow from data collection to analysis\nScenario: Your organization is keen on monitoring water temperatures from lakes, ponds, and streams in the vicinity. Sensors have been deployed across these water bodies, capable of making HTTPS calls to transmit data, including sensor ID and temperature readings. These sensors are programmed to send data every 15 minutes.\nBrief Overview In this workshop, participants will embark on a journey to create a comprehensive system that ingests, stores, and analyzes water temperature data from sensors deployed across different water bodies. Leveraging key AWS services, we\u0026rsquo;ll ensure efficient data flow, storage, and analysis.\nKey Components: Amazon S3: Primary data storage layer. Amazon OpenSearch Service: For data indexing and searching. Amazon API Gateway \u0026amp; AWS Lambda: Data ingestion and processing pipeline. Content Introduction Preparation Creating an Amazon OpenSearch Service cluster Creating an S3 bucket Setting Up AWS Lambda Function Modify S3 and OpenSearch Policy for Lambda access Adding Environment Variables to the Lambda Function Creating a REST API and Checking Solution Clean up resources Duration: Approximately 35 minutes\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/2-prerequiste/2.1-resources/",
+	"title": "Resources",
+	"tags": [],
+	"description": "",
+	"content": "Download the Lambda Function For this workshop, you\u0026rsquo;ll need a specific Lambda function to process the incoming data.\nDownload the upload-data.zip file which contains the lambda.py essential for our tasks.\nContents of lambda.py import boto3 import requests from requests_aws4auth import AWS4Auth import os import json import datetime region = \u0026#39;ap-southeast-1\u0026#39; service = \u0026#39;es\u0026#39; credentials = boto3.Session().get_credentials() awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token) index = \u0026#39;lambda-s3-index\u0026#39; type = \u0026#39;_doc\u0026#39; host = os.environ[\u0026#39;ES_DOMAIN_URL\u0026#39;] url = host + \u0026#39;/\u0026#39; + index + \u0026#39;/\u0026#39; + type headers = { \u0026#34;Content-Type\u0026#34;: \u0026#34;application/json\u0026#34; } s3 = boto3.client(\u0026#39;s3\u0026#39;) bucket = os.environ[\u0026#39;S3_BUCKET\u0026#39;] # Lambda execution starts here def handler(event, context): sensorID = event[\u0026#39;sensorID\u0026#39;] timestamp = datetime.datetime.now().strftime(\u0026#34;%Y%m%d%H%M%S\u0026#34;) temperature = event[\u0026#39;temperature\u0026#39;] document = { \u0026#34;sensorID\u0026#34;: sensorID, \u0026#34;timestamp\u0026#34;: timestamp, \u0026#34;temperature\u0026#34;: temperature } print(document) # post to S3 for storage s3.put_object(Body=json.dumps(document).encode(), Bucket=bucket, Key=sensorID+\u0026#34;-\u0026#34;+timestamp+\u0026#34;.json\u0026#34;) # post to amazon elastic search for indexing and kibana use r = requests.post(url, auth=awsauth, json=document, headers=headers) print(r) print(url) response = \u0026#34;Data Uploaded\u0026#34; return { \u0026#34;Response\u0026#34; : response, \u0026#34;sensorID\u0026#34; : sensorID, \u0026#34;temperature\u0026#34;: temperature } "
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/2-prerequiste/2.2-createiamrole/",
+	"title": "Create IAM Role",
+	"tags": [],
+	"description": "",
+	"content": "Introduction To ensure smooth data ingestion into our data lake, we need to set up an IAM Role. This role will grant the necessary permissions for AWS services, such as Lambda, to interact with Amazon S3 and Amazon OpenSearch Service.\nStep-by-Step Guide to Create the IAM Role Access IAM Management Console: Navigate to the IAM service administration interface.\nRoles Section: On the left navigation pane, select Roles.\nInitiate Role Creation: Click on Create role.\nSelect Service: Choose AWS service, followed by Lambda (since our Lambda function will be interacting with S3 and OpenSearch). Then, proceed by clicking Next.\nSearch and Select Policies: In the search bar, type AmazonS3FullAccess and select it. Next, search for AmazonESFullAccess and select it as well. Once both policies are selected, move to the next step by clicking Next.\nName and Create the Role: Assign the name data-lake to the role. Finalize the creation by clicking Create Role.\nNote the name of your S3 bucket. You will need to use its name in future steps.\nUpcoming Steps With the IAM Role configured, we\u0026rsquo;re now set to proceed with the data ingestion process, leveraging AWS Lambda to push data into our data lake.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/6-modify-s3-and-aos-policy/6.2-opensearch/",
+	"title": "Modify OpenSearch Service Cluster for Lambda Access",
+	"tags": [],
+	"description": "",
+	"content": "To ensure our Lambda function can access the OpenSearch Service cluster, we need to modify the cluster\u0026rsquo;s access policy.\nNavigate to the OpenSearch Service console.\nSelect the appropriate domain (e.g., water-temp). Ensure the Domain status says “Active.” If not, wait a few minutes and refresh the page.\nNote the Domain endpoint for future section, which should look similar to the following example: https://search-water-temp-domain-xxxxxxxxxxxxxxxxxxxxxxxxx.us-east-1.es.amazonaws.com\nChoose Actions and select Edit security configuration.\nScroll to Access policy and review the policy. Currently, the policy restricts access by IP address. The current policy should look similar to the following example:\n{ \u0026#34;Version\u0026#34;: \u0026#34;2012-10-17\u0026#34;, \u0026#34;Statement\u0026#34;: [ { \u0026#34;Effect\u0026#34;: \u0026#34;Allow\u0026#34;, \u0026#34;Principal\u0026#34;: { \u0026#34;AWS\u0026#34;: \u0026#34;*\u0026#34; }, \u0026#34;Action\u0026#34;: \u0026#34;es:*\u0026#34;, \u0026#34;Resource\u0026#34;: \u0026#34;arn:aws:es:us-east-1:000000000000:domain/water-temp/*\u0026#34;, \u0026#34;Condition\u0026#34;: { \u0026#34;IpAddress\u0026#34;: { \u0026#34;aws:SourceIp\u0026#34;: \u0026#34;x.x.x.x\u0026#34; } } } ] } Add Lambda access to the policy. The policy must look similar to the following example, but with your account number and IP address: { \u0026#34;Version\u0026#34;: \u0026#34;2012-10-17\u0026#34;, \u0026#34;Statement\u0026#34;: [ { \u0026#34;Effect\u0026#34;: \u0026#34;Allow\u0026#34;, \u0026#34;Principal\u0026#34;: { \u0026#34;AWS\u0026#34;: \u0026#34;*\u0026#34; }, \u0026#34;Action\u0026#34;: \u0026#34;es:*\u0026#34;, \u0026#34;Resource\u0026#34;: \u0026#34;arn:aws:es:us-east-1:000000000000:domain/water-temp/*\u0026#34;, \u0026#34;Condition\u0026#34;: { \u0026#34;IpAddress\u0026#34;: { \u0026#34;aws:SourceIp\u0026#34;: \u0026#34;x.x.x.x\u0026#34; } } }, { \u0026#34;Effect\u0026#34;: \u0026#34;Allow\u0026#34;, \u0026#34;Principal\u0026#34;: { \u0026#34;AWS\u0026#34;: \u0026#34;arn:aws:iam::615700818209:role/data-lake\u0026#34; }, \u0026#34;Action\u0026#34;: \u0026#34;es:*\u0026#34;, \u0026#34;Resource\u0026#34;: \u0026#34;arn:aws:es:us-east-1:000000000000:domain/water-temp/*\u0026#34; } ] } Review.\nChoose Save changes\nConclusion You have now modified the OpenSearch Service cluster to allow the Lambda function to access it.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/2-prerequiste/",
+	"title": "Preparation ",
+	"tags": [],
+	"description": "",
+	"content": "In this preparation section, you\u0026rsquo;ll set up the necessary resources and configurations to ingest mock data into a data lake. This involves downloading sample data and setting up an IAM role with the required permissions.\nContent Resources Create IAM Role "
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/3-amazon-opensearch-service/",
+	"title": "Creating an Amazon OpenSearch Service cluster",
+	"tags": [],
+	"description": "",
+	"content": "Introduction Amazon OpenSearch Service makes it easy to deploy, operate, and scale OpenSearch for log analytics, application monitoring, full-text search, and more. In this guide, we\u0026rsquo;ll walk through the steps to set up an Amazon OpenSearch Service domain.\nStep-by-Step Guide to Create an Amazon OpenSearch Service Domain Access the Amazon OpenSearch Service Console: Navigate to the Amazon OpenSearch Service Initiate Domain Creation: Click on Create a new domain. Configure Domain: Domain name: water-temp Domain creation method: Standard create Template: Dev/test Deploy Option(s): Domain without standby Engine Version: 2.7(latest) Data nodes, Instance type: t3.small.search Data nodes, EBS size per node: 10GB Network: Public access Enable fine-grained access control: Clear this setting Access policy: Configure domain level access policy, IPv4 address, Replace * by your IPV4, Action: Allow Find your IPv4 address by using an online lookup service (such as What Is My IP) and note your IPv4 address.\nReview and Create: Go through the configurations and ensure everything is set up as per your requirements. Click on Create. The domain-creation process can take up to 15 minutes to complete. Just go aheead and comeback later.\nConclusion With the Amazon OpenSearch Service domain now set up, you\u0026rsquo;re ready to ingest and analyze data. In the upcoming sections, we\u0026rsquo;ll dive deeper into integrating this with our data lake.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/4-s3-bucket/",
+	"title": "Creating an S3 bucket",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create an S3 bucket to store session logs sent from EC2 instances.\nCreate S3 Bucket Access S3 service management console Click Create bucket. At the Create bucket page. In the Bucket name field, enter the bucket name (e.g., datalakes-workshop1) In the Region section, select Region you are doing the current lab. The bucket Region should be the same Region that your OpenSearch Service cluster is in.\nThe name of the S3 bucket must not be the same as all other S3 buckets in the system. You can substitute your name and enter a random number when generating the S3 bucket name.\nNote the name of your S3 bucket. You will need to use its name in future steps.\nScroll down and click Create bucket. Conclusion With the Amazon S3 bucket now set up, you have a dedicated space to store and manage the data for your data lake. In subsequent sections, we\u0026rsquo;ll explore how to ingest data into this bucket and integrate it with other AWS services.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/5-lambda/",
+	"title": "Setting Up AWS Lambda Function",
+	"tags": [],
+	"description": "",
+	"content": "Introduction AWS Lambda is a serverless compute service that lets you run code without provisioning or managing servers. In this guide, we\u0026rsquo;ll walk through the steps to set up an AWS Lambda function to process our data.\nStep-by-Step Guide to Create an AWS Lambda Function Access the AWS Lambda Console: Navigate to the AWS Lambda dashboard.\nInitiate Function Creation: Click on Create function.\nFunction Configuration:\nAuthor from scratch: Keep this option selected Name: Provide a name for your Lambda function (e.g., upload-data). Runtime: Select the latest supported version of Python Permissions: Expand Change default execution role Execution role: Use an existing role Existing role: data-lake Set up Lambda:\nUpload code: If you have a .zip file (like the upload-data.zip), choose \u0026ldquo;Upload a .zip file\u0026rdquo; and upload your file.\nSet region: Set value of region to your current region you practice the lab (e.g. ap-southeast-1) Runtime settings: Scroll to Runtime settings and choose Edit then In the Handler box, replace the existing value with lambda.handler and choose Save. Environment Variables: Choose the Configuration tab, choose Environment variables and then choose Edit. Choose Add environment variable and configure the following settings. Key: S3_BUCKET Value: Paste your bucket name (e.g., datalakes-workshop1) Amazon Resource Name: In the Configuration tab menu, choose Permissions. Under Role name, choose the data-lake link. Copy the role Amazon Resource Name (ARN), we\u0026rsquo;ll use it in future sections. Conclusion With the AWS Lambda function now set up, you\u0026rsquo;re equipped to process and ingest data into your data lake. In the upcoming sections, we\u0026rsquo;ll delve into integrating this function with our Amazon S3 bucket and Amazon OpenSearch Service.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/6-modify-s3-and-aos-policy/",
+	"title": "Modify S3 and OpenSearch Policy for Lambda access",
+	"tags": [],
+	"description": "",
+	"content": "In this section, we\u0026rsquo;ll ensure that our AWS Lambda function has the necessary permissions to access both the S3 bucket and the OpenSearch Service cluster. This involves modifying the policies associated with both resources.\nContent Modify S3 Bucket Policy for Lambda Access Modify OpenSearch Service Cluster for Lambda Access "
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/7-adding-var-lambda/",
+	"title": "Adding Environment Variables to the Lambda Function",
+	"tags": [],
+	"description": "",
+	"content": "Adding Environment Variables to the Lambda Function In this section, we will add environment variables to the Lambda function to ensure it can interact with the OpenSearch Service domain.\nNavigate to the Lambda console. Select the function have been created (e.g., upload-data) Choose the Configuration tab. On the tab menu, choose Environment variables and then choose Edit. Choose Add environment variable and configure the following settings: Key: ES_DOMAIN_URL Value: Paste the OpenSearch Service domain endpoint that you noted previously. It should look similar to the following example: https://search-water-temp-domain-xxxxxxxxxxxxxxxxxxxxxxxxx.us-east-1.es.amazonaws.com Ensure that the OpenSearch Service domain endpoint doesn’t have a slash (/) at the end.\n5. Choose Save.\nConclusion You have successfully added an environment variable to the Lambda function, allowing it to interact with the OpenSearch Service domain.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/8-create-api-gateway-and-checking/8.1-creating-rest-api/",
+	"title": "Creating a API Gateway",
+	"tags": [],
+	"description": "",
+	"content": "Setting Up the API Gateway In this section, we will establish an API Gateway to facilitate data reception from the sensors. This API Gateway will trigger the Lambda function, which will subsequently store the data in Amazon S3 and OpenSearch Service.\nAccess the API Gateway console. On the REST API card, select Build. For Create new API, opt for New API. Name the API as sensor-data and then initiate Create API. In the Resources section, from the Actions menu, choose Create Method. From the dropdown, select POST. For POST - Setup, ensure:\nIntegration type is set to Lambda Function. Lambda Function box contains upload-data. Confirm by selecting Save. Testing the API Gateway In the POST - Method Execution section, opt for TEST. In the Request Body box, input the following JSON:\n{ \u0026#34;sensorID\u0026#34; : \u0026#34;0047\u0026#34;, \u0026#34;temperature\u0026#34; : \u0026#34;23\u0026#34; } Conclusion Successfully, you\u0026rsquo;ve set up and tested an API Gateway to receive data from sensors and activate the Lambda function.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/8-create-api-gateway-and-checking/",
+	"title": "Creating a REST API and Checking Solution",
+	"tags": [],
+	"description": "",
+	"content": "Introduction In this section, we will focus on setting up an API Gateway to receive data from the sensors and subsequently test the entire solution. The API Gateway will be responsible for invoking our Lambda function, which will process the data and store it in our Amazon S3 bucket and OpenSearch Service.\nThe first part will guide you through the process of creating the API Gateway, while the second part will ensure that our solution works as expected by testing the data ingestion and retrieval processes.\nLet\u0026rsquo;s get started!\nContent Create a REST API Test the Solution "
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/8-create-api-gateway-and-checking/8.2-checking-solution/",
+	"title": "Test the Solution",
+	"tags": [],
+	"description": "",
+	"content": "Checking OpenSearch Service for Data In this segment, we\u0026rsquo;ll utilize the OpenSearch Service domain to search for the ingested data.\nRetrieve the OpenSearch Service domain URL you saved earlier.For example: https://search-water-temp-5sgqhr6nez5dilp6icwb5n4zhu.ap-southeast-1.es.amazonaws.com\nOpen a new browser tab and input the URL, appending /lambda-s3-index/_search?pretty. (Optional) Execute more tests in the API Gateway. For Example:\n{ \u0026#34;sensorID\u0026#34; : \u0026#34;0028\u0026#34;, \u0026#34;temperature\u0026#34; : \u0026#34;02\u0026#34; } Navigate to the Amazon S3 console and access your bucket. You should spot several .json files. Download one to inspect its content. Conclusion You\u0026rsquo;ve successfully tested the solution, ingesting data into OpenSearch Service and verifying its existence in the Amazon S3 bucket.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/9-clean-up/",
+	"title": "Clean Up Resources",
+	"tags": [],
+	"description": "",
+	"content": "Delete IAM Roles and Policies Navigate to the IAM console. In the left navigation pane, choose Roles. Find the role you\u0026rsquo;ve created for this workshop and delete it. Delete the Amazon OpenSearch Service Domain Navigate to the OpenSearch Service console\nChoose the domain you\u0026rsquo;ve created.\nClick on Delete.\nEmpty and Delete the S3 Bucket Go to the S3 console. Open the bucket you\u0026rsquo;ve created. First, empty the bucket by selecting all the files and choosing Delete. After ensuring the bucket is empty, delete the bucket itself. Delete the Lambda Function Navigate to the Lambda console.\nChoose the function you created.\nClick on Actions and select Delete function.\nDelete the API Gateway Go to the API Gateway console.\nSelect the API you\u0026rsquo;ve set up.\nFrom the Actions dropdown, choose Delete API.\nConclusion You\u0026rsquo;ve successfully cleaned up all the resources you created during this workshop. It\u0026rsquo;s always a good practice to delete unused resources to avoid incurring unnecessary costs.\n"
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]

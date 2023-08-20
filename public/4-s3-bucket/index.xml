@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Creating an S3 bucket on Building a Data Lake with Amazon OpenSearch Service</title>
+    <link>https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/4-s3-bucket/</link>
+    <description>Recent content in Creating an S3 bucket on Building a Data Lake with Amazon OpenSearch Service</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language><atom:link href="https://tanth47.github.io/Building-a-Data-Lake-with-Amazon-OpenSearch-Service/4-s3-bucket/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>
